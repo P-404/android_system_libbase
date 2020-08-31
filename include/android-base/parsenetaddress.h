@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
+ * Copyright (C) 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-#ifndef BASE_STRINGPRINTF_H
-#define BASE_STRINGPRINTF_H
+#pragma once
 
-#include <stdarg.h>
 #include <string>
 
 namespace android {
 namespace base {
 
-// Returns a string corresponding to printf-like formatting of the arguments.
-std::string StringPrintf(const char* fmt, ...)
-    __attribute__((__format__(__printf__, 1, 2)));
-
-// Appends a printf-like formatting of the arguments to 'dst'.
-void StringAppendF(std::string* dst, const char* fmt, ...)
-    __attribute__((__format__(__printf__, 2, 3)));
-
-// Appends a printf-like formatting of the arguments to 'dst'.
-void StringAppendV(std::string* dst, const char* format, va_list ap);
+// Parses |address| into |host| and |port|.
+//
+// If |address| doesn't contain a port number, the default value is taken from
+// |port|. If |canonical_address| is non-null it will be set to "host:port" or
+// "[host]:port" as appropriate.
+//
+// On failure, returns false and fills |error|.
+bool ParseNetAddress(const std::string& address, std::string* host, int* port,
+                     std::string* canonical_address, std::string* error);
 
 }  // namespace base
 }  // namespace android
-
-#endif  // BASE_STRINGPRINTF_H

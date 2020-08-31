@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-#ifndef BASE_FILE_H
-#define BASE_FILE_H
-
-#include <sys/stat.h>
-#include <string>
+#pragma once
 
 namespace android {
 namespace base {
 
-bool ReadFdToString(int fd, std::string* content);
-bool ReadFileToString(const std::string& path, std::string* content);
+// Use memcpy for access to unaligned data on targets with alignment
+// restrictions.  The compiler will generate appropriate code to access these
+// structures without generating alignment exceptions.
+template <typename T>
+static inline T get_unaligned(const void* address) {
+  T result;
+  memcpy(&result, address, sizeof(T));
+  return result;
+}
 
-bool WriteStringToFile(const std::string& content, const std::string& path);
-bool WriteStringToFd(const std::string& content, int fd);
+template <typename T>
+static inline void put_unaligned(void* address, T v) {
+  memcpy(address, &v, sizeof(T));
+}
 
-#if !defined(_WIN32)
-bool WriteStringToFile(const std::string& content, const std::string& path,
-                       mode_t mode, uid_t owner, gid_t group);
-#endif
-
-}  // namespace base
-}  // namespace android
-
-#endif  // BASE_FILE_H
+} // namespace base
+} // namespace android
