@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-#pragma once
+#include <fuzzer/FuzzedDataProvider.h>
 
-#include "errno.h"
+#include "android-base/parsenetaddress.h"
 
-#include "android-base/macros.h"
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t length) {
+  FuzzedDataProvider dataProvider(data, length);
+  std::string contents = dataProvider.ConsumeRemainingBytesAsString();
+  std::string canonical, host, error;
+  int port = 123;
+  android::base::ParseNetAddress(contents, &host, &port, &canonical, &error);
 
-namespace android {
-namespace base {
-
-class ErrnoRestorer {
- public:
-  ErrnoRestorer() : saved_errno_(errno) {}
-
-  ~ErrnoRestorer() { errno = saved_errno_; }
-
-  // Allow this object to be used as part of && operation.
-  explicit operator bool() const { return true; }
-
- private:
-  const int saved_errno_;
-
-  DISALLOW_COPY_AND_ASSIGN(ErrnoRestorer);
-};
-
-}  // namespace base
-}  // namespace android
+  return 0;
+}
